@@ -1,3 +1,5 @@
+import io
+
 from fuzzywuzzy import fuzz
 from os import listdir, makedirs
 from os.path import isfile, join, sep, getsize, exists
@@ -92,8 +94,9 @@ def compare_scripts(scripts):
 
 
 def get_clean_text(path):
-    f = open(path, 'r', errors="ignore")
+    f = io.open(path, 'r', errors="ignore", newline="")
     text = f.read()
+    text = text.replace("\r", "")
     f.close()
     clean_text = clean_script(text).strip()
 
