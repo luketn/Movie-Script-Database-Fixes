@@ -8,6 +8,7 @@ import re
 import time
 import codecs
 import json
+import traceback
 
 from os import listdir, makedirs
 from os.path import isfile, join, sep, getsize, exists
@@ -169,13 +170,17 @@ def get_char_dial(script_noind, tag_vec, tag_set, char_max_words):
     char_ind = [i for i, x in enumerate(script_noind) if tag_vec[i] not in tag_set and all([y.isupper() for y in x.split()])
                 and i != 0 and i != (len(script_noind) - 1)\
                 # and len(script_noind[i - 1].split()) == 0\
-                and len(script_noind[i + 1].split()) > 0\
+                # and len(script_noind[i + 1].split()) > 0\
                 and len(x.split()) < char_max_words\
                 and any([separate_dial_meta(x)[y] for y in [0, 2]])]
-    if char_ind[-1] < (len(script_noind) - 1):
-        char_ind += [len(script_noind) - 1]
+
+    if char_ind:
+        if char_ind[-1] < (len(script_noind) - 1):
+            char_ind += [len(script_noind) - 1]
+        else:
+            char_ind += [len(script_noind)]
     else:
-        char_ind += [len(script_noind)]
+        raise AssertionError("No characters found in script.")
 
     for x in range(len(char_ind) - 1):
         tag_vec[char_ind[x]] = 'C'
@@ -622,7 +627,9 @@ if __name__ == "__main__":
                 "tagged": save_name
             }
         except Exception as err:
-            print(err)
+            print(f"An error occurred processing file {file_orig}. Error: {err}. Skipping.")
+            traceback.print_exception(err)
             pass
+
     with open(join(PARSED_META), "w") as outfile:
         json.dump(meta, outfile, indent=4)
