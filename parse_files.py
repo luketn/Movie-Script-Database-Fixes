@@ -170,7 +170,7 @@ def get_char_dial(script_noind, tag_vec, tag_set, char_max_words):
     char_ind = [i for i, x in enumerate(script_noind) if tag_vec[i] not in tag_set and all([y.isupper() for y in x.split()])
                 and i != 0 and i != (len(script_noind) - 1)\
                 # and len(script_noind[i - 1].split()) == 0\
-                # and len(script_noind[i + 1].split()) > 0\
+                and len(script_noind[i + 1].split()) > 0\
                 and len(x.split()) < char_max_words\
                 and any([separate_dial_meta(x)[y] for y in [0, 2]])]
 
@@ -626,6 +626,9 @@ if __name__ == "__main__":
                 "charinfo": charinfo_name,
                 "tagged": save_name
             }
+        except AssertionError as assertion_error:
+            print(f"{assertion_error} ({file_orig})")
+            pass
         except Exception as err:
             print(f"An error occurred processing file {file_orig}. Error: {err}. Skipping.")
             traceback.print_exception(err)
